@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#080910">
+  <title>code.byus — Digital experiences</title>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+    :root {
+      --bg: #080910;
+      --panel: #10121c;
+      --text: #f3f4fb;
+      --muted: #9295a9;
+      --lime: #c8ff57;
+      --purple: #a88bff;
+      --line: rgba(255,255,255,.1);
+      --mono: "DM Mono", monospace;
+      --sans: "Space Grotesk", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(ellipse at 80% 10%, rgba(119, 83, 255, .12), transparent 32rem),
+        radial-gradient(ellipse at 10% 50%, rgba(200, 255, 87, .06), transparent 32rem),
+        var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      content: "";
+      opacity: .18;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+      background-size: 64px 64px;
+      mask-image: linear-gradient(to bottom, black, transparent 90%);
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .loader {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: grid;
+      place-items: center;
+      background: var(--bg);
+      transition: opacity .7s ease, visibility .7s ease;
+    }
+
+    .loader.done {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .loader-inner { width: min(310px, 78vw); }
+
+    .loader-brand {
+      margin-bottom: 32px;
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: -2px;
+    }
+
+    .loader-brand span { color: var(--lime); }
+
+    .loader-row {
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      font: 11px var(--mono);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .loader-track {
+      height: 3px;
+      margin-top: 12px;
+      overflow: hidden;
+      background: #282a34;
+    }
+
+    .loader-bar {
+      width: 0;
+      height: 100%;
+      background: var(--lime);
+      animation: load 1.65s cubic-bezier(.7,0,.3,1) forwards;
+    }
+
+    @keyframes load {
+      to { width: 100%; }
+    }
+
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 22px 6vw;
+      border-bottom: 1px solid transparent;
+      transition: background .3s, border-color .3s, padding .3s;
+    }
+
+    .nav.scrolled {
+      padding-top: 15px;
+      padding-bottom: 15px;
+      border-color: var(--line);
+      background: rgba(8,9,16,.84);
+      backdrop-filter: blur(16px);
+    }
+
+    .logo {
+      font-size: 21px;
+      font-weight: 700;
+      letter-spacing: -1.2px;
+    }
+
+    .logo span { color: var(--lime); }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 34px;
+      color: #c1c2ce;
+      font-size: 13px;
+    }
+
+    .nav-links a { transition: color .2s; }
+    .nav-links a:hover { color: var(--lime); }
+
+    .nav-cta {
+      padding: 10px 15px;
+      border: 1px solid rgba(200,255,87,.45);
+      border-radius: 4px;
+      color: var(--lime);
+    }
+
+    .hero {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 100svh;
+      padding: 150px 10vw 90px;
+      overflow: hidden;
+    }
+
+    .hero-glow {
+      position: absolute;
+      top: 17%;
+      right: 7%;
+      width: min(42vw, 570px);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(168,139,255,.18), rgba(168,139,255,0) 68%);
+      filter: blur(10px);
+      pointer-events: none;
+      animation: float 8s ease-in-out infinite;
+    }
+
+    .hero-orbit {
+      position: absolute;
+      top: 24%;
+      right: 14%;
+      width: min(29vw, 380px);
+      aspect-ratio: 1;
+      border: 1px solid rgba(200,255,87,.18);
+      border-radius: 50%;
+      transform: rotate(-25deg) scaleY(.58);
+      animation: spin 22s linear infinite;
+    }
+
+    .hero-orbit::after {
+      position: absolute;
+      top: 12%;
+      left: 12%;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--lime);
+      box-shadow: 0 0 24px var(--lime);
+      content: "";
+    }
+
+    @keyframes spin { to { transform: rotate(335deg) scaleY(.58); } }
+    @keyframes float { 50% { transform: translateY(-18px); } }
+
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--lime);
+      font: 11px var(--mono);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--lime);
+      box-shadow: 0 0 12px var(--lime);
+      animation: blink 1.6s infinite;
+    }
+
+    @keyframes blink { 50% { opacity: .3; } }
+
+    h1 {
+      position: relative;
+      z-index: 1;
+      max-width: 850px;
+      margin: 23px 0 20px;
+      font-size: clamp(56px, 9.5vw, 128px);
+      line-height: .91;
+      letter-spacing: -.085em;
+    }
+
+    h1 .outline {
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(243,244,251,.65);
+    }
+
+    h1 .accent { color: var(--lime); }
+
+    .hero-copy {
+      max-width: 460px;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.8;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 13px;
+      margin-top: 29px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 13px;
+      min-height: 48px;
+      padding: 0 19px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      font-size: 13px;
+      transition: transform .2s, background .2s, border-color .2s;
+    }
+
+    .button:hover { transform: translateY(-3px); }
+
+    .button-primary {
+      border-color: var(--lime);
+      background: var(--lime);
+      color: #10120b;
+      font-weight: 700;
+    }
+
+    .button-primary:hover { background: #d8ff86; }
+
+    .button-secondary:hover { border-color: rgba(255,255,255,.4); }
+
+    .arrow { font-size: 17px; }
+
+    .hero-foot {
+      position: absolute;
+      right: 6vw;
+      bottom: 35px;
+      left: 6vw;
+      display: flex;
+      justify-content: space-between;
+      color: #777a8c;
+      font: 10px var(--mono);
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+    }
+
+    .scroll-cue { display: flex; align-items: center; gap: 10px; }
+
+    .scroll-line {
+      width: 42px;
+      height: 1px;
+      background: var(--lime);
+      animation: linePulse 1.8s ease-in-out infinite;
+    }
+
+    @keyframes linePulse {
+      50% { width: 65px; opacity: .45; }
+    }
+
+    .ticker {
+      overflow: hidden;
+      padding: 19px 0;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      background: rgba(255,255,255,.015);
+    }
+
+    .ticker-track {
+      display: flex;
+      width: max-content;
+      animation: ticker 28s linear infinite;
+    }
+
+    .ticker-item {
+      padding: 0 28px;
+      color: #a7a9b6;
+      font: 11px var(--mono);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .ticker-item span { margin-right: 55px; color: var(--lime); }
+
+    @keyframes ticker { to { transform: translateX(-50%); } }
+
+    section.content {
+      padding: 125px 10vw;
+    }
+
+    .section-top {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 32px;
+      margin-bottom: 48px;
+    }
+
+    .section-label {
+      margin-bottom: 14px;
+      color: var(--lime);
+      font: 11px var(--mono);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: clamp(38px, 5.3vw, 70px);
+      line-height: 1;
+      letter-spacing: -.065em;
+    }
+
+    .section-note {
+      max-width: 310px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .services {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .service-card {
+      position: relative;
+      min-height: 285px;
+      padding: 27px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: linear-gradient(145deg, rgba(255,255,255,.045), rgba(255,255,255,.012));
+      transition: transform .35s, border-color .35s, background .35s;
+      transform-style: preserve-3d;
+    }
+
+    .service-card:hover {
+      border-color: rgba(200,255,87,.48);
+      background: linear-gradient(145deg, rgba(200,255,87,.075), rgba(255,255,255,.015));
+    }
+
+    .service-number {
+      color: #737686;
+      font: 11px var(--mono);
+    }
+
+    .service-icon {
+      display: grid;
+      width: 46px;
+      height: 46px;
+      margin: 32px 0 19px;
+      place-items: center;
+      border: 1px solid rgba(200,255,87,.3);
+      border-radius: 12px;
+      color: var(--lime);
+      font-size: 21px;
+    }
+
+    .service-card h3 {
+      margin: 0 0 9px;
+      font-size: 21px;
+      letter-spacing: -.6px;
+    }
+
+    .service-card p {
+      max-width: 260px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .service-glow {
+      position: absolute;
+      right: -45px;
+      bottom: -65px;
+      width: 155px;
+      height: 155px;
+      border-radius: 50%;
+      background: rgba(168,139,255,.1);
+      filter: blur(36px);
+      transition: background .3s;
+    }
+
+    .service-card:hover .service-glow { background: rgba(200,255,87,.16); }
+
+    .demo-section {
+      padding-top: 70px !important;
+    }
+
+    .demo-panel {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 420px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #0d0f17;
+    }
+
+    .demo-copy {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: clamp(30px, 6vw, 72px);
+    }
+
+    .demo-copy h2 { max-width: 440px; }
+
+    .demo-copy p {
+      max-width: 400px;
+      margin: 20px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    .demo-window {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 360px;
+      padding: 30px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% 50%, rgba(168,139,255,.13), transparent 65%),
+        #0b0c13;
+    }
+
+    .demo-window::before {
+      position: absolute;
+      inset: 0;
+      content: "";
+      opacity: .18;
+      background-image: radial-gradient(rgba(255,255,255,.3) .7px, transparent .7px);
+      background-size: 17px 17px;
+    }
+
+    .discord-card {
+      position: relative;
+      z-index: 1;
+      width: min(390px, 100%);
+      padding: 20px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 9px;
+      background: #171923;
+      box-shadow: 0 25px 80px rgba(0,0,0,.4);
+      transform: rotate(-2deg);
+      transition: transform .4s;
+    }
+
+    .demo-window:hover .discord-card { transform: rotate(0) translateY(-5px); }
+
+    .discord-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      color: #d9dbe7;
+      font-size: 12px;
+    }
+
+    .bot-avatar {
+      display: grid;
+      width: 29px;
+      height: 29px;
+      place-items: center;
+      border-radius: 9px;
+      background: linear-gradient(135deg, var(--purple), #6550ff);
+      font-size: 14px;
+    }
+
+    .bot-tag {
+      margin-left: auto;
+      padding: 3px 5px;
+      border-radius: 3px;
+      background: #6574d8;
+      color: white;
+      font: 9px var(--mono);
+    }
+
+    .chat-message {
+      min-height: 110px;
+      padding: 18px 0 10px;
+      color: #c4c6d2;
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .chat-message strong { color: white; }
+    .chat-message .highlight { color: var(--lime); }
+
+    .command-row {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .command {
+      padding: 8px 10px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 4px;
+      background: transparent;
+      color: #b9bbca;
+      font: 10px var(--mono);
+      cursor: pointer;
+      transition: all .2s;
+    }
+
+    .command:hover, .command.active {
+      border-color: var(--purple);
+      background: rgba(168,139,255,.12);
+      color: white;
+    }
+
+    .projects {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 14px;
+    }
+
+    .project-card {
+      position: relative;
+      display: flex;
+      min-height: 270px;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 27px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: linear-gradient(135deg, #171827, #0f1018);
+    }
+
+    .project-card:nth-child(2) {
+      background: linear-gradient(135deg, #1b1c15, #10110d);
+    }
+
+    .project-art {
+      position: absolute;
+      top: 12%;
+      right: 8%;
+      width: 175px;
+      height: 175px;
+      border: 1px solid rgba(168,139,255,.42);
+      border-radius: 50%;
+      box-shadow: 0 0 70px rgba(168,139,255,.14), inset 0 0 40px rgba(168,139,255,.08);
+      animation: spin 18s linear infinite;
+    }
+
+    .project-art::before, .project-art::after {
+      position: absolute;
+      inset: 23px;
+      border: 1px solid rgba(200,255,87,.32);
+      border-radius: 50%;
+      content: "";
+    }
+
+    .project-art::after {
+      inset: 47px;
+      border-color: rgba(255,255,255,.25);
+    }
+
+    .project-card:nth-child(2) .project-art {
+      border-color: rgba(200,255,87,.38);
+      box-shadow: 0 0 70px rgba(200,255,87,.11), inset 0 0 40px rgba(200,255,87,.06);
+    }
+
+    .project-meta {
+      position: relative;
+      z-index: 1;
+      color: var(--lime);
+      font: 10px var(--mono);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .project-card h3 {
+      position: relative;
+      z-index: 1;
+      max-width: 300px;
+      margin: auto 0 7px;
+      font-size: 27px;
+      letter-spacing: -1px;
+    }
+
+    .project-card p {
+      position: relative;
+      z-index: 1;
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .final-cta {
+      position: relative;
+      margin: 50px 6vw 30px;
+      padding: clamp(45px, 9vw, 110px) 30px;
+      overflow: hidden;
+      border: 1px solid rgba(200,255,87,.24);
+      border-radius: 8px;
+      background:
+        radial-gradient(ellipse at 50% 110%, rgba(200,255,87,.13), transparent 55%),
+        #0d0f14;
+      text-align: center;
+    }
+
+    .final-cta h2 {
+      position: relative;
+      z-index: 1;
+      max-width: 750px;
+      margin: 0 auto 22px;
+    }
+
+    .final-cta p {
+      position: relative;
+      z-index: 1;
+      margin: 0 auto 26px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 28px 6vw 35px;
+      color: #777a8c;
+      font: 10px var(--mono);
+      letter-spacing: .8px;
+      text-transform: uppercase;
+    }
+
+    .footer strong { color: var(--text); font-family: var(--sans); }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity .75s ease, transform .75s cubic-bezier(.2,.7,.2,1);
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .services .reveal:nth-child(2), .projects .reveal:nth-child(2) { transition-delay: .12s; }
+    .services .reveal:nth-child(3) { transition-delay: .24s; }
+
+    @media (max-width: 760px) {
+      .nav { padding: 18px 6vw; }
+      .nav-links { gap: 16px; }
+      .nav-links a:not(.nav-cta) { display: none; }
+      .hero { padding-right: 7vw; padding-left: 7vw; }
+      .hero-orbit { top: 20%; right: -6%; width: 54vw; opacity: .7; }
+      .hero-glow { right: -15%; width: 72vw; }
+      .hero-foot { font-size: 8px; }
+      section.content { padding: 90px 7vw; }
+      .section-top { align-items: start; flex-direction: column; margin-bottom: 30px; }
+      .services { grid-template-columns: 1fr; }
+      .service-card { min-height: 245px; }
+      .demo-panel { grid-template-columns: 1fr; }
+      .demo-copy { padding: 38px 28px; }
+      .demo-window { min-height: 330px; }
+      .projects { grid-template-columns: 1fr; }
+      .project-card { min-height: 230px; }
+      .footer { flex-direction: column; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="loader" id="loader" aria-label="Loading">
+    <div class="loader-inner">
+      <div class="loader-brand">code<span>.</span>byus</div>
+      <div class="loader-row">
+        <span>Initializing experience</span>
+        <span id="load-percent">00%</span>
+      </div>
+      <div class="loader-track"><div class="loader-bar"></div></div>
+    </div>
+  </div>
+
+  <nav class="nav" id="nav">
+    <a class="logo" href="#home">code<span>.</span>byus</a>
+    <div class="nav-links">
+      <a href="#services">Services</a>
+      <a href="#work">Selected work</a>
+      <a class="nav-cta" href="#contact">Let's talk <span class="arrow">↗</span></a>
+    </div>
+  </nav>
+
+  <main>
+    <header class="hero" id="home">
+      <div class="hero-glow"></div>
+      <div class="hero-orbit"></div>
+
+      <div class="eyebrow"><span class="status-dot"></span> Independent digital studio</div>
+      <h1>We build<br><span class="outline">what's</span> <span class="accent">next.</span></h1>
+      <p class="hero-copy">
+        Websites, games and Discord bots made to turn big ideas into unforgettable digital experiences.
+      </p>
+      <div class="hero-actions">
+        <a class="button button-primary" href="#services">Explore what we do <span class="arrow">↓</span></a>
+        <a class="button button-secondary" href="#work">View the showcase <span class="arrow">↗</span></a>
+      </div>
+
+      <div class="hero-foot">
+        <span>Design. Code. Create.</span>
+        <span class="scroll-cue"><span class="scroll-line"></span> Scroll to explore</span>
+      </div>
+    </header>
+
+    <div class="ticker" aria-hidden="true">
+      <div class="ticker-track">
+        <div class="ticker-item">Web experiences <span>✳</span> Discord bots <span>✳</span> Game development <span>✳</span> Built for what's next <span>✳</span></div>
+        <div class="ticker-item">Web experiences <span>✳</span> Discord bots <span>✳</span> Game development <span>✳</span> Built for what's next <span>✳</span></div>
+      </div>
+    </div>
+
+    <section class="content" id="services">
+      <div class="section-top reveal">
+        <div>
+          <div class="section-label">01 / What we do</div>
+          <h2>Digital, without<br>the limits.</h2>
+        </div>
+        <p class="section-note">From the first sketch to the final line of code, every detail is made to feel considered, polished and a little unexpected.</p>
+      </div>
+
+      <div class="services">
+        <article class="service-card reveal">
+          <div class="service-number">01 — WEB</div>
+          <div class="service-icon">⌘</div>
+          <h3>Websites</h3>
+          <p>Bold, responsive websites designed to make your idea impossible to ignore.</p>
+          <div class="service-glow"></div>
+        </article>
+        <article class="service-card reveal">
+          <div class="service-number">02 — DISCORD</div>
+          <div class="service-icon">✳</div>
+          <h3>Discord bots</h3>
+          <p>Custom bots that give your community more ways to connect, play and grow.</p>
+          <div class="service-glow"></div>
+        </article>
+        <article class="service-card reveal">
+          <div class="service-number">03 — GAMES</div>
+          <div class="service-icon">↗</div>
+          <h3>Game development</h3>
+          <p>Playful worlds, satisfying mechanics and original ideas brought to life.</p>
+          <div class="service-glow"></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="content demo-section">
+      <div class="demo-panel reveal">
+        <div class="demo-copy">
+          <div class="section-label">02 / A little interaction</div>
+          <h2>A bot that gets your community.</h2>
+          <p>Pick a command to see a tiny preview of what a custom Discord bot could do.</p>
+        </div>
+
+        <div class="demo-window">
+          <div class="discord-card">
+            <div class="discord-head">
+              <div class="bot-avatar">✦</div>
+              <strong>byus.bot</strong>
+              <span class="bot-tag">APP</span>
+            </div>
+            <div class="chat-message" id="bot-message" aria-live="polite">
+              <strong>byus.bot</strong><br>
+              Hey there! I'm ready when you are. Try one of the commands below.
+            </div>
+            <div class="command-row">
+              <button class="command active" data-command="help">/help</button>
+              <button class="command" data-command="rank">/rank</button>
+              <button class="command" data-command="play">/play</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="content" id="work">
+      <div class="section-top reveal">
+        <div>
+          <div class="section-label">03 / The showcase</div>
+          <h2>Made for the<br>next big thing.</h2>
+        </div>
+        <p class="section-note">A glimpse of the kind of digital worlds, tools and experiences we love to create.</p>
+      </div>
+
+      <div class="projects">
+        <article class="project-card reveal">
+          <div class="project-art"></div>
+          <div class="project-meta">Web experience / 2025</div>
+          <h3>Beyond the ordinary.</h3>
+          <p>A concept landing page for a world yet to be explored.</p>
+        </article>
+        <article class="project-card reveal">
+          <div class="project-art"></div>
+          <div class="project-meta">Community tools / 2025</div>
+          <h3>Play together.</h3>
+          <p>A custom bot concept for a growing community.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="final-cta reveal" id="contact">
+      <div class="section-label">Have an idea?</div>
+      <h2>Let's make something<br><span style="color:var(--lime)">people remember.</span></h2>
+      <p>Your next digital project starts with a conversation.</p>
+      <a class="button button-primary" href="#home">Start a project <span class="arrow">↗</span></a>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <strong>code.byus</strong>
+    <span>Independent digital studio</span>
+    <span>Made for what's next — 2025</span>
+  </footer>
+
+  <script>
+    const loader = document.getElementById("loader");
+    const loadPercent = document.getElementById("load-percent");
+    const nav = document.getElementById("nav");
+
+    let progress = 0;
+    const progressTimer = setInterval(() => {
+      progress = Math.min(progress + Math.ceil(Math.random() * 14), 100);
+      loadPercent.textContent = String(progress).padStart(2, "0") + "%";
+
+      if (progress >= 100) {
+        clearInterval(progressTimer);
+        setTimeout(() => loader.classList.add("done"), 250);
+      }
+    }, 120);
+
+    window.addEventListener("scroll", () => {
+      nav.classList.toggle("scrolled", window.scrollY > 30);
+    });
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll(".reveal").forEach((item) => observer.observe(item));
+
+    const messages = {
+      help: "<strong>byus.bot</strong><br>Hey there! I'm ready when you are. Try one of the commands below.",
+      rank: "<strong>byus.bot</strong><br>You're currently <span class='highlight'>#3</span> on the server leaderboard. Keep it up!",
+      play: "<strong>byus.bot</strong><br>Now playing: <span class='highlight'>your next favorite track</span> ♪"
+    };
+
+    document.querySelectorAll(".command").forEach((button) => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll(".command").forEach((item) => item.classList.remove("active"));
+        button.classList.add("active");
+        document.getElementById("bot-message").innerHTML = messages[button.dataset.command];
+      });
+    });
+
+    document.querySelectorAll(".service-card").forEach((card) => {
+      card.addEventListener("pointermove", (event) => {
+        const rect = card.getBoundingClientRect();
+        const x = (event.clientX - rect.left) / rect.width;
+        const y = (event.clientY - rect.top) / rect.height;
+        card.style.transform = `perspective(800px) rotateX(${(0.5 - y) * 5}deg) rotateY(${(x - 0.5) * 5}deg) translateY(-4px)`;
+      });
+
+      card.addEventListener("pointerleave", () => {
+        card.style.transform = "";
+      });
+    });
+  </script>
+</body>
+</html>
